@@ -66,14 +66,11 @@ fn hijack(v: &mut Value) {
     }
 
     Value::Object(ref mut map) => {
-      for (ref mut key, ref mut value) in map {
-        match key.as_str() {
-          "fees" => *key = &"fee".to_owned(),
-          "deposits" => *key = &"deposit".to_owned(),
-          "rewards" => *key = &"reward".to_owned(),
-          _ => (),
-        }
+      if let Some(v) = map.get("fee").cloned() {
+        map.insert("fees".to_owned(), v);
+      }
 
+      for (_, value) in map.iter_mut() {
         hijack(value);
       }
     }
