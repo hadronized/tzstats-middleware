@@ -11,7 +11,43 @@ use warp::Filter;
 async fn main() {
   let target_host = "https://api.tzstats.com";
 
-  let get_route = warp::get().map(move || warp::redirect::temporary(Uri::from_static(target_host)));
+  let get_route_with_body = warp::get()
+    .and(full())
+    .and(body::json())
+    .and_then(async move |full_route: FullPath, body: Value| {
+      Client::new()
+        .get(&format!("{}{}", target_host, full_route.as_str()))
+        .header("Host", "api.tzstats.com")
+        .json(&body)
+        .send()
+        .await
+        .map_err(|_| warp::reject::not_found())
+    })
+    .and_then(async move |resp: Response| {
+      resp
+        .json::<Value>()
+        .await
+        .map_err(|_| warp::reject::not_found())
+    })
+    .map(|j| warp::reply::json(&j));
+
+  let get_route = warp::get()
+    .and(full())
+    .and_then(async move |full_route: FullPath| {
+      Client::new()
+        .get(&format!("{}{}", target_host, full_route.as_str()))
+        .header("Host", "api.tzstats.com")
+        .send()
+        .await
+        .map_err(|_| warp::reject::not_found())
+    })
+    .and_then(async move |resp: Response| {
+      resp
+        .json::<Value>()
+        .await
+        .map_err(|_| warp::reject::not_found())
+    })
+    .map(|j| warp::reply::json(&j));
 
   let post_route = warp::post()
     .and(full())
@@ -34,7 +70,7 @@ async fn main() {
     })
     .map(|j| warp::reply::json(&j));
 
-  let route = get_route.or(post_route);
+  let route = get_route_with_body.or(get_route.or(post_route));
 
   warp::serve(route).run(([127, 0, 0, 1], 8099)).await;
 }
