@@ -29,7 +29,10 @@ async fn main() {
         .await
         .map_err(|_| warp::reject::not_found())
     })
-    .map(|j| warp::reply::json(&j));
+    .map(|mut j| {
+      hijack(&mut j);
+      warp::reply::json(&j)
+    });
 
   let get_route = warp::get()
     .and(full())
@@ -47,7 +50,10 @@ async fn main() {
         .await
         .map_err(|_| warp::reject::not_found())
     })
-    .map(|j| warp::reply::json(&j));
+    .map(|mut j| {
+      hijack(&mut j);
+      warp::reply::json(&j)
+    });
 
   let post_route = warp::post()
     .and(full())
@@ -68,7 +74,10 @@ async fn main() {
         .await
         .map_err(|_| warp::reject::not_found())
     })
-    .map(|j| warp::reply::json(&j));
+    .map(|mut j| {
+      hijack(&mut j);
+      warp::reply::json(&j)
+    });
 
   let route = get_route_with_body.or(get_route.or(post_route));
 
