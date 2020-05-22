@@ -4,7 +4,6 @@ use reqwest::{Client, Response};
 use serde_json::Value;
 use warp::filters::body;
 use warp::filters::path::{full, FullPath};
-use warp::http::Uri;
 use warp::Filter;
 
 #[tokio::main]
