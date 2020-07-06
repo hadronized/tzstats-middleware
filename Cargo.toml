@@ -1,6 +1,6 @@
 [package]
 name = "tzstats-middleware"
-version = "0.1.0"
+version = "0.1.1"
 license = "BSD-3-Clause"
 authors = ["Dimitri Sabadie <dimitri.sabadie@gmail.com>"]
 repository = "https://github.com/phaazon/tzstats-middleware"
@@ -9,6 +9,7 @@ edition = "2018"
 
 [dependencies]
 serde_json = "1"
+structopt = "0.3.15"
 reqwest = { version = "0.10", default-features = false, features = ["blocking", "json", "native-tls-vendored"] }
 tokio = { version = "0.2", features = ["macros"] }
 warp = "0.2"
